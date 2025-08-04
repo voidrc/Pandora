@@ -54,7 +54,6 @@ alias tofish="sudo chsh $USER -s /bin/fish && echo 'Now log out.'"  # change she
 ### 🔁 Shutdown / Reboot
 alias shutdown="sudo shutdown now"          # shutdown immediately
 alias reboot="sudo reboot now"              # reboot system
-alias rebootforce='sudo shutdown -r -n now' # force reboot
 
 # <<====================================================>>
 

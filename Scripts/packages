@@ -22,7 +22,7 @@ declare -A PACKAGE_CATEGORIES=(
     ["IDE"]="vscodium obsidian"
     ["Communication"]="vesktop telegram-desktop"
     ["Gaming"]="xmcl-electron-bin cachyos-gaming-meta cachyos-gaming-applications"
-    ["Utilities"]="ranger youtube-dl-git mpv-mpris yt-dlp fastfetch"
+    ["Utilities"]="ranger youtube-dl-git mpv-mpris yt-dlp fzf mediainfo fastfetch"
     ["System"]="power-profiles-daemon asusctl supergfxctl rog-control-center"
 )
 

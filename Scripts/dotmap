@@ -30,10 +30,8 @@ SKIP_CONFIRM=false
 
 # Extended trash list - add your demo directories here
 declare -a TRASH=(
-  "$CONF/hypr/hyprland/keybinds.conf
-  "$LOCAL/share"
-  "$LOCAL/lib" 
-  "$HOME/.cache/thumbnails"
+  "$CONF/hypr/hyprland/keybinds.conf"
+  "$CONF/fish/config.fish"
 )
 
 # Parse arguments
