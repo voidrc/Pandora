@@ -1,0 +1,107 @@
+{
+	"$schema": "https://json.schemastore.org/package",
+	"name": "wallbash",
+	"displayName": "Wallbash",
+	"description": "VSCode dynamic theme using wallbash",
+	"version": "0.3.6",
+	"publisher": "TheHyDEProject",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/HyDE-Project/vscode-wallbash",
+		"issues": "https://github.com/HyDE-Project/vscode-wallbash/issues",
+		"pulls": "https://github.com/HyDE-Project/vscode-wallbash/pulls"
+	},
+	"license": "GPL",
+	"engines": {
+		"vscode": "^1.93.0"
+	},
+	"extensionKind": [
+		"ui",
+		"workspace"
+	],
+	"categories": [
+		"Themes"
+	],
+	"keywords": [
+		"theme",
+		"wallbash",
+		"dynamic",
+		"hyde",
+		"hyprland",
+		"hyde",
+		"wallpaper",
+		"color",
+		"The HyDE Project",
+		"color scheme",
+		"aesthetic"
+	],
+	"icon": "hyde.png",
+	"activationEvents": [
+		"onStartupFinished"
+	],
+	"main": "./out/extension.js",
+	"contributes": {
+		"commands": [
+			{
+				"command": "wallBash.reload",
+				"title": "Reload Colors",
+				"description": "Update wallbash colors & set 'Wallbash' as the current theme",
+				"category": "Wallbash"
+			}
+		],
+		"configuration": {
+			"title": "Wallbash",
+			"properties": {
+				"wallBash.autoUpdate": {
+					"type": "boolean",
+					"default": true,
+					"description": "Update colors when wallbash changes"
+				},
+				"wallBash.enableThemeMode": {
+					"type": "boolean",
+					"default": true,
+					"description": "Changes colors ONLY on theme change (Disable for dynamic wallpaper color changes)"
+				},
+				"wallbash.debug": {
+					"type": "boolean",
+					"default": false,
+					"description": "Debug mode"
+				}
+			}
+		},
+		"themes": [
+			{
+				"label": "Wallbash",
+				"uiTheme": "vs-dark",
+				"path": "./themes/wallbash.json",
+				"_watch": true
+			}
+		]
+	},
+	"scripts": {
+		"vscode:prepublish": "npm run compile",
+		"compile": "tsc -p ./",
+		"watch": "tsc -watch -p ./",
+		"pretest": "npm run compile && npm run lint",
+		"lint": "eslint src",
+		"test": "vscode-test"
+	},
+	"devDependencies": {
+		"@types/mocha": "^10.0.9",
+		"@types/node": "20.x",
+		"@typescript-eslint/eslint-plugin": "^8.10.0",
+		"@typescript-eslint/parser": "^8.7.0",
+		"eslint": "^9.13.0",
+		"typescript": "^5.6.3",
+		"@vscode/test-cli": "^0.0.10",
+		"@vscode/test-electron": "^2.4.1"
+	},
+	"dependencies": {
+		"chokidar": "^3.6.0"
+	},
+	"__metadata": {
+		"installedTimestamp": 1752668919650,
+		"targetPlatform": "undefined",
+		"size": 683164
+	}
+}

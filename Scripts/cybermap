@@ -1,0 +1,121 @@
+#!/usr/bin/env bash
+# ---------------------------------------------------------------------------
+# cybermap — Manifest Cybersecurity Operations Structure
+# ---------------------------------------------------------------------------
+
+set -euo pipefail
+
+# Color definitions
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+CYAN='\033[0;36m'
+NC='\033[0m'
+
+# Base directory configuration
+BASE="${CYBEROPS_BASE:-$HOME/CyberOps}"
+
+# Create base directory first
+mkdir -p "$BASE" || {
+    echo -e "${RED}Failed to create base directory: $BASE${NC}" >&2
+    exit 1
+}
+
+# Directory structure definition - using array instead of associative array
+declare -a DIRS=(
+    # Red Team
+    "$BASE/Red_Team/Engagements"
+    "$BASE/Red_Team/Tools"
+    "$BASE/Red_Team/Payloads"
+    "$BASE/Red_Team/Notes"
+    "$BASE/Red_Team/Command_Logs"
+    
+    # Blue Team
+    "$BASE/Blue_Team/IR_Cases"
+    "$BASE/Blue_Team/Detection_Engineering"
+    "$BASE/Blue_Team/Threat_Hunting"
+    "$BASE/Blue_Team/Log_Analysis"
+    "$BASE/Blue_Team/Playbooks"
+    
+    # Threat Intel
+    "$BASE/Threat_Intel/Feeds"
+    "$BASE/Threat_Intel/IOCs"
+    "$BASE/Threat_Intel/TTPs"
+    "$BASE/Threat_Intel/Reports"
+    "$BASE/Threat_Intel/APTs"
+    
+    # OSINT
+    "$BASE/OSINT/Targets"
+    "$BASE/OSINT/Tools"
+    "$BASE/OSINT/Dorks"
+    "$BASE/OSINT/Findings"
+    
+    # Automation
+    "$BASE/Automation/Python"
+    "$BASE/Automation/Bash"
+    "$BASE/Automation/PowerShell"
+    "$BASE/Automation/Other"
+    "$BASE/Automation/Playbooks"
+    
+    # Resources
+    "$BASE/Resources/Cheatsheets"
+    "$BASE/Resources/Methodologies"
+    "$BASE/Resources/Standards"
+    "$BASE/Resources/Compliance"
+    "$BASE/Resources/Templates"
+    
+    # Reports
+    "$BASE/Reports/Red"
+    "$BASE/Reports/Blue"
+    "$BASE/Reports/OSINT"
+    "$BASE/Reports/Executives"
+    
+    # Labs
+    "$BASE/Labs/Exploitation"
+    "$BASE/Labs/Detection"
+    "$BASE/Labs/Malware"
+    "$BASE/Labs/Notes"
+)
+
+# Category markers
+declare -A CATEGORY_MARKERS=(
+    ["Red_Team"]="🔴"
+    ["Blue_Team"]="🔵"
+    ["Threat_Intel"]="📡"
+    ["OSINT"]="🕵️"
+    ["Automation"]="🤖"
+    ["Resources"]="📚"
+    ["Reports"]="📊"
+    ["Labs"]="🧪"
+)
+
+# Create structure
+echo -e "\n${YELLOW}🩸 cybermap — Manifesting Operational Chaos${NC}"
+echo -e "Version: 1.2 | Base: ${CYAN}$BASE${NC}\n"
+
+echo -e "${CYAN}Creating CyberOps structure...${NC}"
+echo "┌───────────────────────────────┬────────────────────────────────────────┐"
+
+last_category=""
+for path in "${DIRS[@]}"; do
+    # Extract category
+    category="${path#$BASE/}"
+    category="${category%%/*}"
+    
+    # Print category header if changed
+    if [[ "$category" != "$last_category" ]]; then
+        [[ -n "$last_category" ]] && echo "├───────────────────────────────┼────────────────────────────────────────┤"
+        printf "│ ${CATEGORY_MARKERS[$category]:- } %-25s │ %-34s │\n" "$category" "Creating directories..."
+        last_category="$category"
+    fi
+    
+    # Create directory
+    if mkdir -p "$path" 2>/dev/null; then
+        printf "│ %-25s   │ ${GREEN}%-34s${NC} │\n" " " "${path##*/}"
+    else
+        printf "│ %-25s   │ ${RED}%-34s${NC} │\n" " " "Failed: ${path##*/}"
+    fi
+done
+
+echo "└───────────────────────────────┴────────────────────────────────────────┘"
+echo -e "\n${GREEN}✅ CyberOps structure created at: ${CYAN}$BASE${NC}"

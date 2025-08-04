@@ -1,0 +1,118 @@
+{
+	"name": "monochromator",
+	"displayName": "Monochromator",
+	"description": "A simple monochrome theme",
+	"version": "0.23.3",
+	"engines": {
+		"vscode": "^1.0.0"
+	},
+	"categories": [
+		"Themes"
+	],
+	"keywords": [
+		"monochrome",
+		"monochromatic",
+		"minimal",
+		"minimalist",
+		"minimalism",
+		"black and white",
+		"grayscale",
+		"greyscale",
+		"contrast",
+		"clean",
+		"focus"
+	],
+	"publisher": "beem",
+	"license": "MIT",
+	"icon": "images/icon.png",
+	"repository": {
+		"type": "git",
+		"url": "https://codeberg.org/beem/monochromator.git"
+	},
+	"bugs": {
+		"url": "https://codeberg.org/beem/monochromator/issues",
+		"email": "mail@beem.software"
+	},
+	"contributes": {
+		"themes": [
+			{
+				"label": "Monochromator Dark",
+				"uiTheme": "vs-dark",
+				"path": "./themes/dark/default.json"
+			},
+			{
+				"label": "Monochromator Dark Amber",
+				"uiTheme": "vs-dark",
+				"path": "./themes/dark/amber.json"
+			},
+			{
+				"label": "Monochromator Dark Amethyst",
+				"uiTheme": "vs-dark",
+				"path": "./themes/dark/amethyst.json"
+			},
+			{
+				"label": "Monochromator Dark Emerald",
+				"uiTheme": "vs-dark",
+				"path": "./themes/dark/emerald.json"
+			},
+			{
+				"label": "Monochromator Dark Plain",
+				"uiTheme": "vs-dark",
+				"path": "./themes/dark/plain.json"
+			},
+			{
+				"label": "Monochromator Dark Ruby",
+				"uiTheme": "vs-dark",
+				"path": "./themes/dark/ruby.json"
+			},
+			{
+				"label": "Monochromator Dark Sulfur",
+				"uiTheme": "vs-dark",
+				"path": "./themes/dark/sulfur.json"
+			},
+			{
+				"label": "Monochromator Light",
+				"uiTheme": "vs",
+				"path": "./themes/light/default.json"
+			},
+			{
+				"label": "Monochromator Light Amber",
+				"uiTheme": "vs",
+				"path": "./themes/light/amber.json"
+			},
+			{
+				"label": "Monochromator Light Amethyst",
+				"uiTheme": "vs",
+				"path": "./themes/light/amethyst.json"
+			},
+			{
+				"label": "Monochromator Light Emerald",
+				"uiTheme": "vs",
+				"path": "./themes/light/emerald.json"
+			},
+			{
+				"label": "Monochromator Light Plain",
+				"uiTheme": "vs",
+				"path": "./themes/light/plain.json"
+			},
+			{
+				"label": "Monochromator Light Ruby",
+				"uiTheme": "vs",
+				"path": "./themes/light/ruby.json"
+			},
+			{
+				"label": "Monochromator Light Sulfur",
+				"uiTheme": "vs",
+				"path": "./themes/light/sulfur.json"
+			}
+		]
+	},
+	"vsce": {
+		"baseContentUrl": "https://codeberg.org/beem/monochromator/raw/branch/master"
+	},
+	"__metadata": {
+		"installedTimestamp": 1753531681833,
+		"targetPlatform": "universal",
+		"size": 848979
+	}
+}

@@ -1,0 +1,123 @@
+#!/usr/bin/env bash
+
+# -e: Exit immediately on error
+# -u: Treat unset variables as error
+# -o pipefail: Pipeline fails if any command fails
+set -euo pipefail
+
+# Color definitions
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+CYAN='\033[0;36m'
+NC='\033[0m' # No Color
+
+# Enhanced logging functions
+info() { echo -e "${CYAN}[ℹ] $1${NC}"; }
+success() { echo -e "${GREEN}[✓] $1${NC}"; }
+warning() { echo -e "${YELLOW}[⚠] $1${NC}" >&2; }
+error() { echo -e "${RED}[✗] $1${NC}" >&2; }
+
+# Check and cache sudo credentials
+check_sudo() {
+    info "Checking sudo privileges..."
+    sudo -v || {
+        error "Failed to obtain sudo privileges"
+        exit 1
+    }
+    # Refresh sudo credentials in background
+    while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
+}
+
+# Verify required commands
+check_dependencies() {
+    local missing=()
+    for cmd in git pacman; do
+        if ! command -v "$cmd" &>/dev/null; then
+            missing+=("$cmd")
+        fi
+    done
+
+    if [[ ${#missing[@]} -gt 0 ]]; then
+        error "Missing required commands: ${missing[*]}"
+        exit 1
+    fi
+}
+
+# Install system dependencies
+install_dependencies() {
+    info "Installing system dependencies..."
+    sudo pacman -S --needed --noconfirm git base-devel || {
+        error "Dependency installation failed"
+        exit 1
+    }
+}
+
+# Clone repository safely
+clone_repository() {
+    local repo_dir="dots-hyprland"
+    local repo_url="https://github.com/end-4/dots-hyprland.git"
+
+    if [[ -d "$repo_dir" ]]; then
+        warning "Found existing $repo_dir directory"
+        read -rp "Remove it for clean installation? (y/N): " choice
+        if [[ "${choice,,}" != "y" ]]; then
+            info "Keeping existing directory. Aborting installation."
+            exit 0
+        fi
+        info "Removing existing directory..."
+        rm -rf "$repo_dir" || {
+            error "Failed to remove directory"
+            exit 1
+        }
+    fi
+
+    info "Cloning repository..."
+    git clone "$repo_url" "$repo_dir" || {
+        error "Repository cloning failed"
+        exit 1
+    }
+}
+
+# Main execution flow
+main() {
+    # Initial checks
+    check_sudo
+    check_dependencies
+    
+    # Installation process
+    install_dependencies
+    clone_repository
+    
+    # Run installation scripts
+    info "Running Hyprland installation..."
+    "./dots-hyprland/install.sh" || {
+        error "Main installation script failed"
+        exit 1
+    }
+
+    # Run configuration scripts
+    info "Configuring workspace..."
+    local scripts=("packages" "cybermap" "dotmap")
+    for script in "${scripts[@]}"; do
+        info "Running $script..."
+        "./Scripts/$script" || {
+            error "$script script failed"
+            exit 1
+        }
+    done
+
+    success "System restoration complete!"
+    
+    # Reboot prompt
+    read -rp $'\n\e[1;33mReboot now? (Y/n): \e[0m' choice
+    if [[ ! "${choice,,}" =~ ^n ]]; then
+        info "Rebooting system..."
+        sudo reboot
+    else
+        warning "Manual reboot required for changes to take effect"
+    fi
+}
+
+# Start main function
+main
