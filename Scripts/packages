@@ -53,6 +53,13 @@ check_dependencies() {
     fi
 }
 
+# BlackArch integration for CyberSec tools
+blackarch() {
+    curl -O https://blackarch.org/strap.sh
+    chmod +x ./strap.sh
+    sudo ./strap.sh
+}
+
 # Install packages with comprehensive error handling
 install_packages() {
     local all_packages=()
@@ -199,6 +206,7 @@ main() {
     # Check and install dependencies
     info "Checking system dependencies..."
     check_dependencies
+    blackarch
     
     # Install packages
     info "Installing packages..."
