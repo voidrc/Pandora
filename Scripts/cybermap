@@ -23,6 +23,45 @@ mkdir -p "$BASE" || {
 
 # Directory structure definition - using array instead of associative array
 declare -a DIRS=(
+    # Automation
+    "$BASE/Automation/Python"
+    "$BASE/Automation/Bash"
+    "$BASE/Automation/PowerShell"
+    "$BASE/Automation/Other"
+    "$BASE/Automation/Playbooks"
+
+    # Blue Team
+    "$BASE/Blue_Team/IR_Cases"
+    "$BASE/Blue_Team/Detection_Engineering"
+    "$BASE/Blue_Team/Threat_Hunting"
+    "$BASE/Blue_Team/Log_Analysis"
+    "$BASE/Blue_Team/Playbooks"
+
+    # CTFs
+    "$BASE/CTFs/Chals"
+    "$BASE/CTFs/Writeups"
+    
+    # Labs
+    "$BASE/Labs/Exploitation"
+    "$BASE/Labs/Detection"
+    "$BASE/Labs/Malware"
+    "$BASE/Labs/Notes"
+    
+    # Notes
+    "$BASE/Notes/01_Set-Up"
+    "$BASE/Notes/02_Linux"
+    "$BASE/Notes/03_Networking"
+    "$BASE/Notes/04_Home-Lab"
+    "$BASE/Notes/05_Scripting"
+    "$BASE/Notes/06_Hacking"
+    "$BASE/Notes/07_To-Sort"
+    
+    # OSINT
+    "$BASE/OSINT/Targets"
+    "$BASE/OSINT/Tools"
+    "$BASE/OSINT/Dorks"
+    "$BASE/OSINT/Findings"
+
     # Red Team
     "$BASE/Red_Team/Engagements"
     "$BASE/Red_Team/Tools"
@@ -30,51 +69,26 @@ declare -a DIRS=(
     "$BASE/Red_Team/Notes"
     "$BASE/Red_Team/Command_Logs"
     
-    # Blue Team
-    "$BASE/Blue_Team/IR_Cases"
-    "$BASE/Blue_Team/Detection_Engineering"
-    "$BASE/Blue_Team/Threat_Hunting"
-    "$BASE/Blue_Team/Log_Analysis"
-    "$BASE/Blue_Team/Playbooks"
-    
+    # Reports
+    "$BASE/Reports/Red"
+    "$BASE/Reports/Blue"
+    "$BASE/Reports/OSINT"
+    "$BASE/Reports/Executives"
+       
+    # Resources
+    "$BASE/Resources/Cheatsheets"
+    "$BASE/Resources/Methodologies"
+    "$BASE/Resources/Standards"
+    "$BASE/Resources/Compliance"
+    "$BASE/Resources/Courses"
+    "$BASE/Resources/Templates"
+
     # Threat Intel
     "$BASE/Threat_Intel/Feeds"
     "$BASE/Threat_Intel/IOCs"
     "$BASE/Threat_Intel/TTPs"
     "$BASE/Threat_Intel/Reports"
     "$BASE/Threat_Intel/APTs"
-    
-    # OSINT
-    "$BASE/OSINT/Targets"
-    "$BASE/OSINT/Tools"
-    "$BASE/OSINT/Dorks"
-    "$BASE/OSINT/Findings"
-    
-    # Automation
-    "$BASE/Automation/Python"
-    "$BASE/Automation/Bash"
-    "$BASE/Automation/PowerShell"
-    "$BASE/Automation/Other"
-    "$BASE/Automation/Playbooks"
-    
-    # Resources
-    "$BASE/Resources/Cheatsheets"
-    "$BASE/Resources/Methodologies"
-    "$BASE/Resources/Standards"
-    "$BASE/Resources/Compliance"
-    "$BASE/Resources/Templates"
-    
-    # Reports
-    "$BASE/Reports/Red"
-    "$BASE/Reports/Blue"
-    "$BASE/Reports/OSINT"
-    "$BASE/Reports/Executives"
-    
-    # Labs
-    "$BASE/Labs/Exploitation"
-    "$BASE/Labs/Detection"
-    "$BASE/Labs/Malware"
-    "$BASE/Labs/Notes"
 )
 
 # Category markers
@@ -94,7 +108,6 @@ echo -e "\n${YELLOW}🩸 cybermap — Manifesting Operational Chaos${NC}"
 echo -e "Version: 1.2 | Base: ${CYAN}$BASE${NC}\n"
 
 echo -e "${CYAN}Creating CyberOps structure...${NC}"
-echo "┌───────────────────────────────┬────────────────────────────────────────┐"
 
 last_category=""
 for path in "${DIRS[@]}"; do
@@ -104,18 +117,16 @@ for path in "${DIRS[@]}"; do
     
     # Print category header if changed
     if [[ "$category" != "$last_category" ]]; then
-        [[ -n "$last_category" ]] && echo "├───────────────────────────────┼────────────────────────────────────────┤"
-        printf "│ ${CATEGORY_MARKERS[$category]:- } %-25s │ %-34s │\n" "$category" "Creating directories..."
+        echo -e "${CATEGORY_MARKERS[$category]:-} ${CYAN}$category${NC}"
         last_category="$category"
     fi
     
     # Create directory
     if mkdir -p "$path" 2>/dev/null; then
-        printf "│ %-25s   │ ${GREEN}%-34s${NC} │\n" " " "${path##*/}"
+        echo -e "  ${GREEN}+${NC} ${path}"
     else
-        printf "│ %-25s   │ ${RED}%-34s${NC} │\n" " " "Failed: ${path##*/}"
+        echo -e "  ${RED}✗${NC} Failed to create: ${path}"
     fi
 done
 
-echo "└───────────────────────────────┴────────────────────────────────────────┘"
 echo -e "\n${GREEN}✅ CyberOps structure created at: ${CYAN}$BASE${NC}"
