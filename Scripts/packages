@@ -19,11 +19,11 @@ error() { echo -e "${RED}[✗] $1${NC}" >&2; }
 
 # Package categories
 declare -A PACKAGE_CATEGORIES=(
-    ["IDE"]="vscodium obsidian"
+    ["IDE"]="cursor-bin obsidian"
     ["Communication"]="vesktop telegram-desktop"
-    ["Gaming"]="xmcl-electron-bin cachyos-gaming-meta cachyos-gaming-applications"
+    ["Gaming"]="xmcl-launcher cachyos-gaming-meta cachyos-gaming-applications"
     ["Utilities"]="ranger youtube-dl-git mpv-mpris yt-dlp fzf mediainfo fastfetch cava"
-    ["System"]="power-profiles-daemon asusctl supergfxctl rog-control-center"
+    ["RogLaptop"]="power-profiles-daemon asusctl supergfxctl rog-control-center"
 )
 
 # Services to enable & start
@@ -60,80 +60,159 @@ blackarch() {
     sudo ./strap.sh
 }
 
-# Install packages with comprehensive error handling
+# Install packages in queued batches (official first, then AUR)
 install_packages() {
     local all_packages=()
+    local pacman_queue=()
+    local aur_queue=()
     local failed_packages=()
+    local failed_official=()
+    local failed_aur=()
     local installed_count=0
     local skipped_count=0
+    local already_installed=()
+    local installed_now=()
 
-    # Combine all packages
+    # Gather all packages (flatten categories)
     for category in "${!PACKAGE_CATEGORIES[@]}"; do
-        all_packages+=(${PACKAGE_CATEGORIES[$category]})
+        for pkg in ${PACKAGE_CATEGORIES[$category]}; do
+            [[ -z "$pkg" ]] && continue
+            all_packages+=("$pkg")
+        done
+    done
+
+    # Count already installed beforehand (both repo and AUR)
+    for pkg in "${all_packages[@]}"; do
+        if pacman -Qi "$pkg" &>/dev/null; then
+            ((skipped_count++))
+            already_installed+=("$pkg")
+        fi
     done
 
     info "Updating package databases..."
     sudo pacman -Sy --noconfirm || {
         error "Failed to update package databases"
-        exit 1
+        return 1
     }
 
-    # Install each package
+    # Split into official repo vs AUR queues
     for pkg in "${all_packages[@]}"; do
-        # Skip empty elements
-        [[ -z "$pkg" ]] && continue
-        
-        local category_name=""
-        for category in "${!PACKAGE_CATEGORIES[@]}"; do
-            if [[ " ${PACKAGE_CATEGORIES[$category]} " =~ " $pkg " ]]; then
-                category_name=$category
-                break
-            fi
-        done
-
-        printf "\n${BLUE}▸ ${NC}Installing ${CYAN}%-25s${NC} [${YELLOW}%s${NC}]" "$pkg" "${category_name:-Unknown}"
-        
-        # Check if installed
-        if pacman -Qi "$pkg" &>/dev/null; then
-            echo -e " ${GREEN}✔ Already installed${NC}"
-            ((skipped_count++))
-            continue
-        fi
-
-        # Install from official repos or AUR
         if pacman -Si "$pkg" &>/dev/null; then
-            sudo pacman -S --noconfirm "$pkg" &>/dev/null && {
-                echo -e " ${GREEN}✔ Installed from official repos${NC}"
-                ((installed_count++))
-            } || {
-                echo -e " ${RED}✖ Installation failed${NC}"
-                failed_packages+=("$pkg (official)")
-                continue
-            }
+            # Determine which repository provides this package
+            local repo
+            repo=$(pacman -Si "$pkg" 2>/dev/null | awk -F': *' '/^Repository/{print tolower($2); exit}')
+            # If provided by chaotic-aur, prefer installing via yay to avoid fetch/signature issues
+            if [[ "$repo" == "chaotic-aur" ]]; then
+                aur_queue+=("$pkg")
+            else
+                pacman_queue+=("$pkg")
+            fi
         else
-            yay -S --noconfirm --needed --cleanafter "$pkg" &>/dev/null && {
-                echo -e " ${GREEN}✔ Installed from AUR${NC}"
-                ((installed_count++))
-            } || {
-                echo -e " ${RED}✖ AUR installation failed${NC}"
-                failed_packages+=("$pkg (AUR)")
-            }
+            aur_queue+=("$pkg")
         fi
     done
 
+    # Log queued packages
+    if ((${#pacman_queue[@]} > 0)); then
+        echo -e "${CYAN}Queued (official):${NC} ${YELLOW}${#pacman_queue[@]}${NC}"
+        echo -e "  ${BLUE}- ${NC}${pacman_queue[*]}"
+    fi
+    if ((${#aur_queue[@]} > 0)); then
+        echo -e "${CYAN}Queued (AUR):${NC} ${YELLOW}${#aur_queue[@]}${NC}"
+        echo -e "  ${BLUE}- ${NC}${aur_queue[*]}"
+    fi
+    if ((${#already_installed[@]} > 0)); then
+        echo -e "${CYAN}Already installed:${NC} ${YELLOW}${#already_installed[@]}${NC}"
+        echo -e "  ${GREEN}- ${NC}${already_installed[*]}"
+    fi
+
+    # Batch install official repo packages
+    if ((${#pacman_queue[@]} > 0)); then
+        echo -e "\n${BLUE}▸ ${NC}Installing official packages: ${CYAN}${#pacman_queue[@]} queued${NC}"
+        if sudo pacman -S --noconfirm --needed "${pacman_queue[@]}" &>/dev/null; then
+            :
+        else
+            warning "Some official packages may have failed"
+        fi
+        # Retry any pacman-queued packages that remain uninstalled via yay (fallback)
+        local retry_via_yay=()
+        for pkg in "${pacman_queue[@]}"; do
+            if ! pacman -Qi "$pkg" &>/dev/null; then
+                retry_via_yay+=("$pkg")
+            fi
+        done
+        if ((${#retry_via_yay[@]} > 0)); then
+            echo -e "${YELLOW}↻ Retrying ${#retry_via_yay[@]} package(s) via AUR helper${NC}"
+            yay -S --noconfirm --needed --cleanafter "${retry_via_yay[@]}" &>/dev/null || true
+        fi
+    fi
+
+    # Batch install AUR packages
+    if ((${#aur_queue[@]} > 0)); then
+        echo -e "\n${BLUE}▸ ${NC}Installing AUR packages: ${CYAN}${#aur_queue[@]} queued${NC}"
+        if yay -S --noconfirm --needed --cleanafter "${aur_queue[@]}" &>/dev/null; then
+            :
+        else
+            warning "Some AUR packages may have failed"
+        fi
+    fi
+
+    # Post-install verification to compute installed and failed
+    for pkg in "${all_packages[@]}"; do
+        if pacman -Qi "$pkg" &>/dev/null; then
+            # If it wasn't originally installed, count as installed now
+            local was_installed_before=false
+            for ai in "${already_installed[@]}"; do
+                if [[ "$ai" == "$pkg" ]]; then
+                    was_installed_before=true
+                    break
+                fi
+            done
+            if ! $was_installed_before; then
+                ((installed_count++))
+                installed_now+=("$pkg")
+            fi
+        else
+            if pacman -Si "$pkg" &>/dev/null; then
+                failed_packages+=("$pkg (official)")
+                failed_official+=("$pkg")
+            else
+                failed_packages+=("$pkg (AUR)")
+                failed_aur+=("$pkg")
+            fi
+        fi
+    done
+
+    # Adjust installed_count to exclude those that were already installed
+    if ((installed_count > skipped_count)); then
+        installed_count=$((installed_count - skipped_count))
+    else
+        installed_count=0
+    fi
+
     # Summary
     echo -e "\n${CYAN}Installation Summary:${NC}"
-    echo -e "• ${GREEN}Installed: $installed_count packages${NC}"
+    echo -e "• ${GREEN}Installed now: $installed_count packages${NC}"
+    if ((${#installed_now[@]} > 0)); then
+        echo -e "  ${GREEN}- ${NC}${installed_now[*]}"
+    fi
     echo -e "• ${YELLOW}Skipped: $skipped_count already installed${NC}"
-    
+    if ((${#already_installed[@]} > 0)); then
+        echo -e "  ${YELLOW}- ${NC}${already_installed[*]}"
+    fi
+
     if [ ${#failed_packages[@]} -gt 0 ]; then
         echo -e "• ${RED}Failed: ${#failed_packages[@]} packages${NC}"
-        for failed in "${failed_packages[@]}"; do
-            echo -e "  - $failed"
-        done
+        if ((${#failed_official[@]} > 0)); then
+            echo -e "  ${RED}official:${NC} ${failed_official[*]}"
+        fi
+        if ((${#failed_aur[@]} > 0)); then
+            echo -e "  ${RED}aur:${NC} ${failed_aur[*]}"
+        fi
+        return ${#failed_packages[@]}
     fi
-    
-    return ${#failed_packages[@]}
+
+    return 0
 }
 
 # Enable and start services with status tracking

@@ -53,32 +53,6 @@ install_dependencies() {
     }
 }
 
-# Clone repository safely
-clone_repository() {
-    local repo_dir="dots-hyprland"
-    local repo_url="https://github.com/end-4/dots-hyprland.git"
-
-    if [[ -d "$repo_dir" ]]; then
-        warning "Found existing $repo_dir directory"
-        read -rp "Remove it for clean installation? (y/N): " choice
-        if [[ "${choice,,}" != "y" ]]; then
-            info "Keeping existing directory. Aborting installation."
-            exit 0
-        fi
-        info "Removing existing directory..."
-        rm -rf "$repo_dir" || {
-            error "Failed to remove directory"
-            exit 1
-        }
-    fi
-
-    info "Cloning repository..."
-    git clone "$repo_url" "$repo_dir" || {
-        error "Repository cloning failed"
-        exit 1
-    }
-}
-
 # Main execution flow
 main() {
     # Initial checks
@@ -87,7 +61,6 @@ main() {
     
     # Installation process
     install_dependencies
-    clone_repository
     
     # Run installation scripts
     info "Running Hyprland installation..."
