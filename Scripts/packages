@@ -19,10 +19,13 @@ error() { echo -e "${RED}[✗] $1${NC}" >&2; }
 
 # Package categories
 declare -A PACKAGE_CATEGORIES=(
-    ["IDE"]="cursor-bin obsidian"
+    ["Editors"]="cursor-bin vim ranger ghostwriter obsidian"
+    ["VM"]="docker-desktop virtualbox"
     ["Communication"]="vesktop telegram-desktop"
     ["Gaming"]="xmcl-launcher cachyos-gaming-meta cachyos-gaming-applications"
-    ["Utilities"]="ranger youtube-dl-git mpv-mpris yt-dlp fzf mediainfo fastfetch cava"
+    ["Media"]="mpv mpv-mpris mpvpaper yt-dlp cava"
+    ["Editing"]="obs-studio-browser davinci-resolve"
+    ["Utilities"]="konsole peek fzf ripgrep ripgrep-all gnu-netcat multitail"
     ["RogLaptop"]="power-profiles-daemon asusctl supergfxctl rog-control-center"
 )
 
@@ -37,27 +40,37 @@ SERVICES=(
 check_dependencies() {
     local missing=()
     
-    # Check for yay
-    if ! command -v yay &>/dev/null; then
-        warning "yay not found - installing now..."
-        sudo pacman -S --needed --noconfirm git base-devel
-        git clone https://aur.archlinux.org/yay-bin.git /tmp/yay-bin
-        (cd /tmp/yay-bin && makepkg -si --noconfirm)
-        success "yay installed successfully"
-    fi
-
     # Check for pacman
     if ! command -v pacman &>/dev/null; then
         error "pacman is required but not installed"
         exit 1
     fi
+    
+    # Check for yay
+    if ! command -v yay &>/dev/null; then
+        warning "yay not found - installing now..."
+        sudo pacman -S --needed --noconfirm git base-devel yay
+        success "yay installed successfully"
+    fi
 }
 
 # BlackArch integration for CyberSec tools
 blackarch() {
-    curl -O https://blackarch.org/strap.sh
-    chmod +x ./strap.sh
-    sudo ./strap.sh
+    # needs to check if blackarch repo is already installed
+    if ! grep -q "blackarch" /etc/pacman.conf; then
+        error "blackarch is required but not installed"
+        # ask if repo is wanted
+        read -rp $'\n\e[1;33mInstall BlackArch repo? (Y/n): \e[0m' choice
+        if [[ ! "${choice,,}" =~ ^n ]]; then
+            curl -O https://blackarch.org/strap.sh
+            chmod +x ./strap.sh
+            sudo ./strap.sh
+            success "BlackArch repo installed successfully"
+        else
+            error "BlackArch repo not installed"
+            exit 1
+        fi
+    fi
 }
 
 # Install packages in queued batches (official first, then AUR)
