@@ -25,7 +25,7 @@ declare -A PACKAGE_CATEGORIES=(
     ["Gaming"]="xmcl-launcher cachyos-gaming-meta cachyos-gaming-applications"
     ["Media"]="mpv mpv-mpris mpvpaper yt-dlp cava"
     ["Editing"]="obs-studio-browser davinci-resolve"
-    ["Utilities"]="konsole peek fzf ripgrep ripgrep-all gnu-netcat multitail"
+    ["Utilities"]="konsole evince fzf ripgrep ripgrep-all gnu-netcat multitail"
     ["RogLaptop"]="power-profiles-daemon asusctl supergfxctl rog-control-center"
 )
 
