@@ -87,6 +87,7 @@ main() {
     # Check AUR
     check_dependencies
     blackarch
+    
 
     # Run packages script
     info "Running packages script..."

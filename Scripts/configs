@@ -1,9 +1,4 @@
 #!/usr/bin/env bash
-# ---------------------------------------------------------------------------
-# dotmap — Bend the world to your will
-# 
-# Cleans unnecessary configs and restores backups
-# ---------------------------------------------------------------------------
 
 # Exit on error, unset variable, and pipe failure
 set -euo pipefail
