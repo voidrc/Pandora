@@ -90,14 +90,14 @@ main() {
 
     # Run packages script
     info "Running packages script..."
-    "./Scripts/packages.sh" || {
+    "./Scripts/packages" || {
         error "Packages script failed"
         exit 1
     }
 
     # Run dots script
-    info "Running dots script..."
-    "./Scripts/dots.sh" || {
+    info "Running configs script..."
+    "./Scripts/configs" || {
         error "Dots script failed"
         exit 1
     }
