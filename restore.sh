@@ -29,56 +29,78 @@ check_sudo() {
     while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
 }
 
+
 # Verify required commands
 check_dependencies() {
-    local missing=()
-    for cmd in git pacman; do
-        if ! command -v "$cmd" &>/dev/null; then
-            missing+=("$cmd")
-        fi
-    done
-
-    if [[ ${#missing[@]} -gt 0 ]]; then
-        error "Missing required commands: ${missing[*]}"
+    local packages_to_install=()
+    
+    # Check for paru (not allowed)
+    if command -v paru &>/dev/null; then
+        warning "paru detected...  yay is required!!!"
         exit 1
+    fi
+    
+    # Check for yay
+    if ! command -v yay &>/dev/null; then
+        packages_to_install+=("yay")
+    fi
+    
+    # Check for rsync
+    if ! command -v rsync &>/dev/null; then
+        packages_to_install+=("rsync")
+    fi
+    
+    # Install queued packages if any
+    if [[ ${#packages_to_install[@]} -gt 0 ]]; then
+        info "Installing missing packages: ${packages_to_install[*]}"
+        sudo pacman -S --needed --noconfirm "${packages_to_install[@]}"
+        success "Dependencies installed successfully"
+    else
+        info "All dependencies are already installed"
     fi
 }
 
-# Install system dependencies
-install_dependencies() {
-    info "Installing system dependencies..."
-    sudo pacman -S --needed --noconfirm git base-devel || {
-        error "Dependency installation failed"
-        exit 1
-    }
+# BlackArch integration for CyberSec tools
+blackarch() {
+    # needs to check if blackarch repo is already installed
+    if ! grep -q "blackarch" /etc/pacman.conf; then
+        error "blackarch is required but not installed"
+        # ask if repo is wanted
+        read -rp $'\n\e[1;33mInstall BlackArch repo? (Y/n): \e[0m' choice
+        if [[ ! "${choice,,}" =~ ^n ]]; then
+            curl -O https://blackarch.org/strap.sh
+            chmod +x ./strap.sh
+            sudo ./strap.sh
+            success "BlackArch repo installed successfully"
+        else
+            error "BlackArch repo not installed"
+            exit 1
+        fi
+    fi
 }
 
 # Main execution flow
 main() {
     # Initial checks
     check_sudo
+
+    # Check AUR
     check_dependencies
-    
-    # Installation process
-    install_dependencies
-    
-    # Run installation scripts
-    info "Running Hyprland installation..."
-    "./dots-hyprland/install.sh" || {
-        error "Main installation script failed"
+    blackarch
+
+    # Run packages script
+    info "Running packages script..."
+    "./Scripts/packages.sh" || {
+        error "Packages script failed"
         exit 1
     }
 
-    # Run configuration scripts
-    info "Configuring workspace..."
-    local scripts=("packages" "cybermap" "dotmap")
-    for script in "${scripts[@]}"; do
-        info "Running $script..."
-        "./Scripts/$script" || {
-            error "$script script failed"
-            exit 1
-        }
-    done
+    # Run dots script
+    info "Running dots script..."
+    "./Scripts/dots.sh" || {
+        error "Dots script failed"
+        exit 1
+    }
 
     success "System restoration complete!"
     

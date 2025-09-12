@@ -23,36 +23,15 @@ error() { echo -e "${RED}[✗] $1${NC}" >&2; }
 
 # Configuration
 CONF="$HOME/.config"
-LOCAL="$HOME/.local"
 BACKUPS="../BackUps"
-DRY_RUN=false
-SKIP_CONFIRM=false
 
-# Extended trash list - add your demo directories here
+# Files to delete
 declare -a TRASH=(
   "$CONF/hypr/hyprland/keybinds.conf"
   "$CONF/fish/config.fish"
 )
 
-# Parse arguments
-while [[ $# -gt 0 ]]; do
-  case "$1" in
-    --dry-run)
-      DRY_RUN=true
-      shift
-      ;;
-    --yes)
-      SKIP_CONFIRM=true
-      shift
-      ;;
-    *)
-      error "Unknown option: $1"
-      exit 1
-      ;;
-  esac
-done
-
-# Cleanup function with safety checks
+# Cleanup function
 clean_trash() {
   info "Cleaning unnecessary configurations..."
   local deleted=0 skipped=0 errors=0
@@ -60,12 +39,6 @@ clean_trash() {
   for path in "${TRASH[@]}"; do
     if [[ ! -e "$path" ]]; then
       ((skipped++))
-      continue
-    fi
-
-    if $DRY_RUN; then
-      info "[DRY RUN] Would delete: ${path/#$HOME\//~\/}"
-      ((deleted++))
       continue
     fi
 
@@ -79,15 +52,16 @@ clean_trash() {
   done
 
   # Summary
-  echo -e "\n${CYAN}Cleanup Summary:${NC}"
-  echo -e "• ${GREEN}Deleted: $deleted items${NC}"
-  echo -e "• ${YELLOW}Skipped: $skipped (not found)${NC}"
-  [[ $errors -gt 0 ]] && echo -e "• ${RED}Errors: $errors failures${NC}"
+  echo
+  info "Cleanup Summary:"
+  success "Deleted: $deleted items"
+  warning "Skipped: $skipped (not found)"
+  [[ $errors -gt 0 ]] && error "Errors: $errors failures"
   
   return $errors
 }
 
-# Backup restoration with verification
+# Backup restoration
 restore_backups() {
   info "Restoring backups from: $BACKUPS"
   
@@ -104,31 +78,11 @@ restore_backups() {
   fi
 
   local restored=0 errors=0
-  local rsync_available=$(command -v rsync &>/dev/null && echo true || echo false)
-  
-  if $DRY_RUN; then
-    info "[DRY RUN] Would restore:"
-    find "$BACKUPS" -mindepth 1 -maxdepth 1 | while read -r item; do
-      info "  ~> ${item/#$BACKUPS\//}"
-    done
-    return 0
-  fi
 
-  # Use rsync if available, otherwise cp
-  if $rsync_available; then
-    info "Using rsync for restoration..."
-    if rsync -avh --progress "$BACKUPS"/ "$HOME"/; then
-      restored=$(find "$BACKUPS" -mindepth 1 | wc -l)
-    else
-      errors=1
-    fi
+  if rsync -avh --progress "$BACKUPS"/ "$HOME"/; then
+    restored=$(find "$BACKUPS" -mindepth 1 | wc -l)
   else
-    warning "rsync not found, using cp (may be slower)"
-    if cp -vr "$BACKUPS"/* "$HOME"/; then
-      restored=$(find "$BACKUPS" -mindepth 1 | wc -l)
-    else
-      errors=1
-    fi
+    errors=1
   fi
 
   # Summary
@@ -145,11 +99,6 @@ restore_backups() {
 fix_permissions() {
   info "Fixing permissions..."
   
-  if $DRY_RUN; then
-    info "[DRY RUN] Would run: chown -R $USER:$USER $HOME"
-    return 0
-  fi
-
   if sudo chown -R "$USER:$USER" "$HOME"; then
     success "Permissions fixed"
     return 0
@@ -160,22 +109,17 @@ fix_permissions() {
 }
 
 # Main function
-main() {
-  echo -e "\n${YELLOW}🗺️ dotmap — Reconfiguring Reality${NC}"
-  
+main() {  
   # Confirmation prompt
-  if ! $SKIP_CONFIRM && ! $DRY_RUN; then
-    warning "This will PERMANENTLY delete configuration files and restore backups"
-    read -rp "Are you sure you want to continue? (y/N): " confirm
-    [[ "${confirm,,}" != "y" ]] && exit 0
-  fi
+  warning "This will PERMANENTLY delete configuration files and restore backups"
+  read -rp "Are you sure you want to continue? (y/N): " confirm
+  [[ "${confirm,,}" != "y" ]] && exit 0
 
   # Execute operations
   clean_trash
   restore_backups
   fix_permissions
-
-  echo -e "\n${GREEN}✅ dotmap — Reality reconfigured to your will${NC}"
+  success "dots restored!!!"
 }
 
 # Execute main function

@@ -36,45 +36,8 @@ SERVICES=(
     "asusd"
 )
 
-# Check and install dependencies
-check_dependencies() {
-    local missing=()
-    
-    # Check for pacman
-    if ! command -v pacman &>/dev/null; then
-        error "pacman is required but not installed"
-        exit 1
-    fi
-    
-    # Check for yay
-    if ! command -v yay &>/dev/null; then
-        warning "yay not found - installing now..."
-        sudo pacman -S --needed --noconfirm git base-devel yay
-        success "yay installed successfully"
-    fi
-}
-
-# BlackArch integration for CyberSec tools
-blackarch() {
-    # needs to check if blackarch repo is already installed
-    if ! grep -q "blackarch" /etc/pacman.conf; then
-        error "blackarch is required but not installed"
-        # ask if repo is wanted
-        read -rp $'\n\e[1;33mInstall BlackArch repo? (Y/n): \e[0m' choice
-        if [[ ! "${choice,,}" =~ ^n ]]; then
-            curl -O https://blackarch.org/strap.sh
-            chmod +x ./strap.sh
-            sudo ./strap.sh
-            success "BlackArch repo installed successfully"
-        else
-            error "BlackArch repo not installed"
-            exit 1
-        fi
-    fi
-}
-
 # Install packages in queued batches (official first, then AUR)
-install_packages() {
+function install_packages() {
     local all_packages=()
     local pacman_queue=()
     local aur_queue=()
@@ -297,7 +260,6 @@ main() {
     
     # Check and install dependencies
     info "Checking system dependencies..."
-    check_dependencies
     blackarch
     
     # Install packages
