@@ -1,11 +1,11 @@
 ## 🔍 DIRECTORY & FILE MANAGEMENT
 
 ### 📁 Listing Files/Directories (using `eza`)
-alias ls='eza -lh  --icons=auto'                                        # long readable list
+alias ls='eza -lh  --icons=auto --sort=name --group-directories-first'  # long readable list
 alias la='eza -lha --icons=auto --sort=name --group-directories-first'  # long readable list all
 alias ld='eza -lhD --icons=auto'                                        # long readable list dirs
 alias lf='ls -lhF --color=auto | grep -v "^d"'                          # long readable list files
-alias l.='ls -ld .?*'                                                   # long readable list hidden
+alias l.='ls -ld .*'                                                    # long readable list hidden
 alias lt='eza --icons=auto --tree'                                      # tree like list
 
 ### 📂 Change Directory Shortcuts
@@ -24,7 +24,6 @@ alias duf='duf -theme ansi'                     # disk usage/free viewer with an
 alias biggest="du -h --max-depth=1 | sort -hr"  # biggest directories
 
 ### 🔌 Hardware & CPU Info
-alias hw="hwinfo --short"                                   # brief hardware info
 alias vulns="lscpu | grep -E 'Model name|Vulnerability'"    # show CPU model and vulnerabilities
 
 ### ⚠️ Logs & Failures
@@ -57,16 +56,6 @@ alias reboot="sudo reboot now"              # reboot system
 
 # <<====================================================>>
 
-## 📸 SNAPPER SNAPSHOT MANAGEMENT
-alias snap_croot="sudo snapper -c root create-config /"     # create snapper config for root
-alias snap_chome="sudo snapper -c home create-config /home" # create snapper config for home
-alias snap_setup="snap_croot && snap_chome"                 # setup snapper for root and home
-alias snap_list="sudo snapper list"                         # list all snapshots
-alias snap_root="sudo snapper -c root create"               # create root snapshot
-alias snap_home="sudo snapper -c home create"               # create home snapshot
-
-# <<====================================================>>
-
 ## 🛠️ MODIFIED COMMANDS & SHORTCUTS
 
 ### 🧼 Safe Alternatives (commented or optional)
@@ -91,7 +80,7 @@ alias phpunit='phpunit --colors'    # phpunit with color output
 alias rg="rg --sort path"           # ripgrep with path sorting
 
 ### 🎨 Fun Commands
-alias clear="clear && fastfetch"    # clear terminal and show system info
+alias fastfetch="fastfetch --logo none" 
 
 # <<====================================================>>
 
