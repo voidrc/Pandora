@@ -9,7 +9,7 @@ style_user = "bold red"
 # Second param
 [hostname]
 disabled = false
-format = "[$hostname]($style) in "
+format = "[$hostname]($style) "
 ssh_only = false
 style = "bold dimmed red"
 trim_at = "-"
@@ -17,9 +17,9 @@ trim_at = "-"
 # Third param
 [directory]
 style = "purple"
-truncate_to_repo = true
+truncate_to_repo = false
 truncation_length = 0
-truncation_symbol = "repo: "
+truncation_symbol = " "
 
 # Fourth param
 [sudo]
@@ -35,7 +35,7 @@ style = "white"
 
 # Last param in the first line/row
 [cmd_duration]
-disabled = false
+disabled = true
 format = "took [$duration]($style)"
 min_time = 1
 
@@ -80,7 +80,7 @@ disabled = true
 format = '[\[$symbol$status_common_meaning$status_signal_name$status_maybe_int\]]($style)'
 map_symbol = true
 pipestatus = true
-symbol = "🔴"
+symbol = ""
 
 [aws]
 symbol = " "

@@ -15,13 +15,6 @@ fastfetch --config hyde/*.jsonc
   "display": {
     "separator": " : "
   },
-  "modules": [
-    {
-      "type": "command",
-      "key": "  ",
-      "keyColor": "blue",
-      "text": "splash=$(hyprctl splash);echo $splash"
-    },
     "modules": [
       {
           "type": "os",
