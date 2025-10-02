@@ -252,6 +252,12 @@ function verify_services() {
     done
 }
 
+function blackarch() {
+  curl -O https://blackarch.org/strap.sh
+  sudo chmod +x strap.sh
+  ./strap.sh
+}
+
 # Main execution flow
 main() {
     echo -e "\n${YELLOW}📦 Starting Package Installation Process${NC}"
@@ -260,6 +266,8 @@ main() {
     # Check and install dependencies
     info "Checking system dependencies..."
     
+    blackarch
+
     # Install packages
     info "Installing packages..."
     if ! install_packages; then
