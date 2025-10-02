@@ -19,14 +19,13 @@ error() { echo -e "${RED}[✗] $1${NC}" >&2; }
 
 # Package categories
 declare -A PACKAGE_CATEGORIES=(
-    ["Editors"]="cursor-bin vim ranger ghostwriter obsidian"
-    ["VM"]="docker-desktop virtualbox"
-    ["Communication"]="vesktop telegram-desktop"
-    ["Gaming"]="xmcl-launcher cachyos-gaming-meta cachyos-gaming-applications"
-    ["Media"]="mpv mpv-mpris mpvpaper yt-dlp cava"
-    ["Editing"]="obs-studio-browser davinci-resolve"
-    ["Utilities"]="konsole evince fzf ripgrep ripgrep-all gnu-netcat multitail libva-nvidia-driver"
-    ["RogLaptop"]="power-profiles-daemon asusctl supergfxctl rog-control-center"
+  ["Communication"]="vesktop-git telegram-desktop"
+  ["Editors"]="ranger ghostwriter"
+  ["VM"]="virtualbox"
+  ["Media"]="mpv-mpris-git mpvpaper-git yt-dlp cava"
+  # ["Editing"]="davinci-resolve"
+  ["Utilities"]="gnu-netcat multitail"
+  ["RogLaptop"]="power-profiles-daemon asusctl supergfxctl rog-control-center"
 )
 
 # Services to enable & start
@@ -260,7 +259,6 @@ main() {
     
     # Check and install dependencies
     info "Checking system dependencies..."
-    blackarch
     
     # Install packages
     info "Installing packages..."
