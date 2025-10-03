@@ -21,7 +21,7 @@ error() { echo -e "${RED}[✗] $1${NC}" >&2; }
 declare -A PACKAGE_CATEGORIES=(
   ["Communication"]="vesktop-git telegram-desktop"
   ["Editors"]="ranger ghostwriter"
-  ["VM"]="virtualbox"
+  ["VM"]="virtualbox virtualbox-host-modules-arch"
   ["Media"]="mpv-mpris-git mpvpaper-git yt-dlp cava"
   # ["Editing"]="davinci-resolve"
   ["Utilities"]="gnu-netcat multitail"
@@ -255,7 +255,7 @@ function verify_services() {
 function blackarch() {
   curl -O https://blackarch.org/strap.sh
   sudo chmod +x strap.sh
-  ./strap.sh
+  sudo ./strap.sh
 }
 
 # Main execution flow
