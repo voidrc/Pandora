@@ -1,0 +1,11 @@
+{
+  "config": [
+    "$HOME/.config/fish/",
+    ""
+  ],
+  "local": [
+    "$HOME/.local/share/omarchy/",
+    ""
+  ]
+}
+
