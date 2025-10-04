@@ -26,7 +26,6 @@ mapfile -t CON_PATH < <(jq -r '.config[]' "$JSON")
 for p in "${CON_PATH[@]}"; do
   p=$(eval echo "$p")
   if [[ -d "$p" || -f "$p" ]]; then
-    local safe_name target
     safe_name="${p#$HOME/.config/}"
     target="$BACKUP_DIR/.config/$safe_name"
     mkdir -p "$target"
@@ -41,7 +40,6 @@ mapfile -t LOC_PATH < <(jq -r '.local[]' "$JSON")
 for p in "${LOC_PATH[@]}"; do
   p=$(eval echo "$p")
   if [[ -d "$p" || -f "$p" ]]; then
-    local safe_name target
     safe_name="${p#$HOME/.local/share/}"
     target="$BACKUP_DIR/.local/share/$safe_name"
     mkdir -p "$target"

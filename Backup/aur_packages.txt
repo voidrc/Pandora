@@ -1,0 +1,10 @@
+asusctl
+firefox-bin
+gnu-netcat
+mpv-mpris-git
+mpvpaper-git
+multitail
+rog-control-center
+supergfxctl-git
+vesktop-git
+xmcl-launcher

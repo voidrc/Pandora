@@ -1,10 +1,15 @@
 {
   "config": [
+    "$HOME/.config/alacritty/",
+    "$HOME/.config/fastfetch/",
     "$HOME/.config/fish/",
-    ""
+    "$HOME/.config/hypr/",
+    "$HOME/.config/ranger/",
+    "$HOME/.config/rog/",
+    "$HOME/.config/starship/",
+    "$HOME/.config/waybar/"
   ],
   "local": [
-    "$HOME/.local/share/omarchy/",
     ""
   ]
 }
