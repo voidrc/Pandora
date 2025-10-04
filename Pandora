@@ -88,18 +88,10 @@ main() {
     check_dependencies
     blackarch
     
-
     # Run packages script
     info "Running packages script..."
-    "./Scripts/packages" || {
+    "./Scripts/restore" || {
         error "Packages script failed"
-        exit 1
-    }
-
-    # Run dots script
-    info "Running configs script..."
-    "./Scripts/configs" || {
-        error "Dots script failed"
         exit 1
     }
 
