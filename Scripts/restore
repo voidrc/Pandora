@@ -2,15 +2,15 @@
 
 echo "Starting restore process..."
 
-RESTORE_DIR="../Backup/"
+RESTORE_DIR="Backup"
 
 # 1. Restore .config and .local/share
 read -p "This will overwrite your current ~/.config and ~/.local/share. Do you want to proceed? (y/N): " CONFIRM_RESTORE_FILES
 if [[ "$CONFIRM_RESTORE_FILES" =~ ^[Yy]$ ]]; then
     echo "Restoring ~/.config..."
-    rsync -a --delete "$RESTORE_DIR/.config/" "$HOME/.config/" || { echo "Error: Could not restore ~/.config."; rm -rf "$RESTORE_DIR"; exit 1; }
+    rsync -avhLu "$RESTORE_DIR/.config/" "$HOME/.config/"
     echo "Restoring ~/.local/share..."
-    rsync -a --delete "$RESTORE_DIR/.local/share/" "$HOME/.local/share/" || { echo "Error: Could not restore ~/.local/share."; rm -rf "$RESTORE_DIR"; exit 1; }
+    rsync -avhLu "$RESTORE_DIR/.local/share/" "$HOME/.local/share/"
 else
     echo "File restoration skipped."
 fi
