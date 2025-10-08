@@ -1,12 +1,8 @@
 {
   "config": [
-    "$HOME/.config/alacritty/",
-    "$HOME/.config/fastfetch/",
-    "$HOME/.config/fish/",
+    "$HOME/.config/kitty/",
     "$HOME/.config/hypr/",
     "$HOME/.config/ranger/",
-    "$HOME/.config/rog/",
-    "$HOME/.config/starship/",
     "$HOME/.config/waybar/"
   ],
   "local": [

@@ -30,7 +30,7 @@ for p in "${CON_PATH[@]}"; do
     target="$BACKUP_DIR/.config/$safe_name"
     mkdir -p "$target"
     echo ">>> syncing $p → $target"
-    rsync -aL --delete "$p" "$target/"
+    rsync -avhL --delete "$p" "$target/"
   else
     echo "!!! $p missing, skipping"
   fi
@@ -44,7 +44,7 @@ for p in "${LOC_PATH[@]}"; do
     target="$BACKUP_DIR/.local/share/$safe_name"
     mkdir -p "$target"
     echo ">>> syncing $p → $target"
-    rsync -aL --delete "$p" "$target/"
+    rsync -avhL --delete "$p" "$target/"
     else
       echo "!!! $p missing, skipping"
     fi
